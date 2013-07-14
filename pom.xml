@@ -28,13 +28,5 @@
   	</plugins>
   </build>
   
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <description>This annotation based library provides a mechanism for marking a class as immutable as well as for marking a class to only have immutable generic type parameters. Such marked classes can actually be verified to meet these criteria by the compiler utilizing the included annotation processor.</description>
 </project>
