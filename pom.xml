@@ -4,7 +4,7 @@
 
   <groupId>com.jasonstedman.extensions</groupId>
   <artifactId>immutable-j</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
   <packaging>jar</packaging>
 
   <name>immutable-j</name>
@@ -36,5 +36,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <description>This annotation based library provides a mechanism for marking a class as immutable. Such marked classes can actually be verified to be immutable by the compiler utilizing the included annotation processor. </description>
+  <description>This annotation based library provides a mechanism for marking a class as immutable as well as for marking a class to only have immutable generic type parameters. Such marked classes can actually be verified to meet these criteria by the compiler utilizing the included annotation processor.</description>
 </project>

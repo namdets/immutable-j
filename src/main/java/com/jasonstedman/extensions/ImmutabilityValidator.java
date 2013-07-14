@@ -54,7 +54,7 @@ import javax.tools.Diagnostic.Kind;
  * enforced by this library.
  * 
  * @author Jason Stedman
- * @version 1.0
+ * @version 1.1
  * 
  */
 public class ImmutabilityValidator {
@@ -108,6 +108,20 @@ public class ImmutabilityValidator {
 		return false;
 	}
 
+	public static boolean elementOrSuperClassesAreMarkedImmutableTypeParameters(Element element
+			, final ProcessingEnvironment processingEnv) {
+		Types typeUtils = processingEnv.getTypeUtils();
+		Element elementTypeAsElement = typeUtils.asElement(element.asType());
+		if(elementTypeAsElement instanceof TypeElement){
+			return typeElementIsAnnotatedImmutableTypeParameters(typeUtils, elementTypeAsElement);
+		}else if(elementTypeAsElement instanceof TypeParameterElement){
+			return typeParameterElementIsAnnotatedImmutable(typeUtils,
+					elementTypeAsElement);
+		}
+
+		return false;
+	}
+
 	private static boolean typeParameterElementIsAnnotatedImmutable(
 			Types typeUtils, Element elementTypeAsElement) {
 		TypeMirror aClass = elementTypeAsElement.asType();
@@ -146,6 +160,20 @@ public class ImmutabilityValidator {
 		return false;
 	}
 
+	private static boolean typeElementIsAnnotatedImmutableTypeParameters(Types typeUtils,
+			Element elementTypeAsElement) {
+		TypeElement classElement = (TypeElement) elementTypeAsElement;
+		TypeMirror aClass = classElement.asType();
+		while(aClass.getKind()!=TypeKind.NONE){
+			if(classElement.getAnnotation(ImmutableTypeParameters.class)!=null){
+				return true;
+			}
+			aClass = classElement.getSuperclass();
+			classElement = (TypeElement)typeUtils.asElement(aClass);
+		}
+		return false;
+	}
+
 	private static void checkImmutability(final Element element, final Element rootElement
 			, final ProcessingEnvironment processingEnv) {
 		Messager messager = processingEnv.getMessager();
@@ -174,7 +202,7 @@ public class ImmutabilityValidator {
 		return elementTypeName;
 	}
 
-	private static boolean isImmutable(Element element, final ProcessingEnvironment processingEnv) {
+	public static boolean isImmutable(Element element, final ProcessingEnvironment processingEnv) {
 		boolean isImmutable = false;
 
 		isImmutable = (
@@ -193,7 +221,7 @@ public class ImmutabilityValidator {
 		return element.asType().getKind().isPrimitive();
 	}
 
-	private static boolean isImmutableBuiltInClass(String string) {
+	public static boolean isImmutableBuiltInClass(String string) {
 		for(@SuppressWarnings("rawtypes") Class c : IMMUTABLE_CLASSES){
 			if(string.equals(c.getCanonicalName())) return true;
 		}

@@ -2,10 +2,15 @@ immutable-j
 ================
 
 Annotation library adding immutability enforcement for Java at the class 
-level. Instances of a class marked @Immutable can be considered to be
+level. 
+
+Instances of a class marked @Immutable are ensured to be
 proper stable values and references to them can be passed around at
 will, provided that the ImmutableAnnotationProcessor actually runs
 during compilation of the class.
+
+Instances of a class marked @ImmutableTypeParameters are ensured to have
+only generic type parameters of immutable classes.
 
 The definition used for immutability related to this class comes
 from the Oracle Java Tutorial on the subject:
@@ -59,4 +64,17 @@ Currently White-listed Built-in Immutable Classes:
 		java.net.Inet6Address,
 		java.net.InetSocketAddress
 
+
+v1.1 : 
+
+    Updated retention policy to be RetentionPolicy.CLASS instead of
+    RetentionPolicy.RUNTIME and the wording referencing JSR-308. 
+    Enforcement of type parameters on classes through annotations
+    is possible at compilation time already. Enforcement does not 
+    require runtime checks. 
+    
+    Also added new annotation and associated processing to enforce
+    only generic type parameters on a class to be immutable. This
+    is done by specifying an extends clause on the type parameter
+    that is marked @Immutable or meets the criteria for immutability.
 

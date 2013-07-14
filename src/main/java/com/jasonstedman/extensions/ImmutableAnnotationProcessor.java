@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -36,14 +37,17 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic.Kind;
 
+import com.jasonstedman.extensions.ImmutabilityValidator;
+
+
 /** 
  * This annotation processor examines classes marked {@link com.jasonstedman.extensions.Immutable}
- * 
+ * or {@link com.jasonstedman.extensions.ImmutableTypeParameters}
  * @author Jason Stedman
- * @version 1.0
+ * @version 1.1
  * 
  */
-@SupportedAnnotationTypes("com.jasonstedman.extensions.Immutable")
+@SupportedAnnotationTypes(value = {"com.jasonstedman.extensions.Immutable", "com.jasonstedman.extensions.ImmutableTypeParameters"})
 public class ImmutableAnnotationProcessor extends AbstractProcessor {
 
 	@Override
@@ -52,29 +56,34 @@ public class ImmutableAnnotationProcessor extends AbstractProcessor {
 		Set<? extends Element> rootElements = environment.getRootElements();
 		for (Element element : rootElements)
 		{	
-			try{ 
-				TypeElement classElement = (TypeElement) element;
-				@SuppressWarnings("unchecked")
-				List<TypeParameterElement> typeParams = (List<TypeParameterElement>) classElement.getTypeParameters();
-				for(TypeParameterElement e : typeParams){
-					for(TypeMirror extendsType : e.getBounds()){
-						if(!ImmutabilityValidator.elementOrSuperClassesAreMarkedImmutable(
-								processingEnv.getTypeUtils().asElement(extendsType),processingEnv)){
-							processingEnv.getMessager().printMessage(Kind.ERROR, "Class " +element.toString() + 
-									" but type parameter " + e.toString() + " does not extend an immutable class.", element);
+			if(ImmutabilityValidator.elementOrSuperClassesAreMarkedImmutable(element, processingEnv)||
+					ImmutabilityValidator.elementOrSuperClassesAreMarkedImmutableTypeParameters(element, processingEnv)){
+				try{ 
+					TypeElement classElement = (TypeElement) element;
+					@SuppressWarnings("unchecked")
+					List<TypeParameterElement> typeParams = (List<TypeParameterElement>) classElement.getTypeParameters();
+					for(TypeParameterElement e : typeParams){
+						for(TypeMirror extendsType : e.getBounds()){
+							Element extendsTypeAsElement = processingEnv.getTypeUtils().asElement(extendsType);
+							if(!ImmutabilityValidator.elementOrSuperClassesAreMarkedImmutable(extendsTypeAsElement,processingEnv)&&
+									!ImmutabilityValidator.isImmutableBuiltInClass(extendsType.toString())){
+								processingEnv.getMessager().printMessage(Kind.ERROR, "Class " +element.toString() + 
+										" but type parameter " + e + " extends "+extendsType.toString() + " which is not an immutable class.", element);
+							}
 						}
 					}
+					if(ImmutabilityValidator.elementOrSuperClassesAreMarkedImmutable(element, processingEnv)){
+						if(ImmutabilityValidator.elementOrSuperClassesAreMarkedImmutable(element, processingEnv))
+							ImmutabilityValidator.ensureElementIsImmutable(element, element, processingEnv);
+					}
+				}catch(Exception e){
+					ByteArrayOutputStream out = new ByteArrayOutputStream();
+					PrintWriter writer = new PrintWriter(out);
+					e.printStackTrace(writer);
+					writer.close();
+					processingEnv.getMessager().printMessage(Kind.ERROR, new String(out.toByteArray()) , element);
 				}
-				if(ImmutabilityValidator.elementOrSuperClassesAreMarkedImmutable(element, processingEnv))
-					ImmutabilityValidator.ensureElementIsImmutable(element, element, processingEnv);
-			}catch(Exception e){
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				PrintWriter writer = new PrintWriter(out);
-				e.printStackTrace(writer);
-				writer.close();
-				processingEnv.getMessager().printMessage(Kind.ERROR, new String(out.toByteArray()) , element);
 			}
-
 		}
 
 		return false;

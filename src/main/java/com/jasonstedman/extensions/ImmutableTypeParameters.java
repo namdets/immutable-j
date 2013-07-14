@@ -31,8 +31,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /** 
- * This annotation implies that the class being marked is immutable
- * based on the criteria defined in {@link com.jasonstedman.extensions.ImmutabilityValidator}.
+ * This annotation implies that the class being marked has only 
+ * immutable generic type parameters based on the criteria defined 
+ * in {@link com.jasonstedman.extensions.ImmutabilityValidator}.
  * 
  * @author Jason Stedman
  * @version 1.1
@@ -42,5 +43,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(value = RetentionPolicy.CLASS)
 @Documented
 @Inherited
-public @interface Immutable {
+public @interface ImmutableTypeParameters {
 }
