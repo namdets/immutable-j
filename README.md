@@ -67,12 +67,6 @@ Currently White-listed Built-in Immutable Classes:
 
 v1.1 : 
 
-    Updated retention policy to be RetentionPolicy.CLASS instead of
-    RetentionPolicy.RUNTIME and the wording referencing JSR-308. 
-    Enforcement of type parameters on classes through annotations
-    is possible at compilation time already. Enforcement does not 
-    require runtime checks. 
-    
     Also added new annotation and associated processing to enforce
     only generic type parameters on a class to be immutable. This
     is done by specifying an extends clause on the type parameter

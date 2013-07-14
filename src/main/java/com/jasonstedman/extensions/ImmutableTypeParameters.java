@@ -35,12 +35,17 @@ import java.lang.annotation.RetentionPolicy;
  * immutable generic type parameters based on the criteria defined 
  * in {@link com.jasonstedman.extensions.ImmutabilityValidator}.
  * 
+ * The retention policy on this annotation is set to RetentionPolicy.RUNTIME
+ * to enable some use cases to verify immutability of generic type parameters.
+ * This may not be necessary in a future release if JSR-308 makes it to the 
+ * Final Release stage. 
+ * 
  * @author Jason Stedman
  * @version 1.1
  *
  */
 @Target(value = ElementType.TYPE)
-@Retention(value = RetentionPolicy.CLASS)
+@Retention(value = RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
 public @interface ImmutableTypeParameters {
