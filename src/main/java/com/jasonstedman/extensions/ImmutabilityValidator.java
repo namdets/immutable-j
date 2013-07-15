@@ -122,6 +122,18 @@ public class ImmutabilityValidator {
 		return false;
 	}
 
+	public static boolean isImmutableBuiltInClass(String string) {
+		for(@SuppressWarnings("rawtypes") Class c : IMMUTABLE_CLASSES){
+			if(string.equals(c.getCanonicalName())) return true;
+		}
+		return false;
+	}
+
+	public static <T> boolean isImmutableClass(Class<T> clazz){
+		System.out.println(clazz.getCanonicalName());
+		return clazz.isAnnotationPresent(Immutable.class) || isImmutableBuiltInClass(clazz.getCanonicalName());
+	}
+	
 	private static boolean typeParameterElementIsAnnotatedImmutable(
 			Types typeUtils, Element elementTypeAsElement) {
 		TypeMirror aClass = elementTypeAsElement.asType();
@@ -219,13 +231,6 @@ public class ImmutabilityValidator {
 
 	private static boolean isPrimitive(Element element, final ProcessingEnvironment processingEnv) {
 		return element.asType().getKind().isPrimitive();
-	}
-
-	public static boolean isImmutableBuiltInClass(String string) {
-		for(@SuppressWarnings("rawtypes") Class c : IMMUTABLE_CLASSES){
-			if(string.equals(c.getCanonicalName())) return true;
-		}
-		return false;
 	}
 
 	/*
